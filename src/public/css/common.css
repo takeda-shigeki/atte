@@ -5,7 +5,7 @@
 
 .header__inner {
     margin: 0 auto;
-    padding: 20px 15px;
+    padding: 10px 15px;
     max-width: 1230px;
 }
 
@@ -18,13 +18,13 @@
 
 .header__logo {
     color: black;
-    text-decoration: none;
     font-weight: bold;
+    text-decoration: none;
     font-size: 24px;
 }
 
 .header-utilities nav {
-    width: 18%;
+    width: 25%;
 }
 
 .header-nav {
@@ -34,21 +34,23 @@
 }
 
 .header-nav__link {
-    color: #fff;
+    color: black;
+    font-weight: bold;
     text-decoration: none;
 }
 
 .header-nav__button {
     border: none;
     background: transparent;
-    color: #fff;
+    color: black;
     font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
 }
 
 main {
     background-color: rgb(240, 247, 255);
-    height: 500px;
+    height: 600px;
 }
 
 footer {

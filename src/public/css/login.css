@@ -19,7 +19,7 @@
     margin-bottom: 5px;
 }
 
-.form__group-title {
+.form__group-content {
     text-align: left;
 }
 
@@ -44,7 +44,7 @@
     height: 40px;
     border: none;
     border-radius: 3px;
-    background: blue;
+    background: rgb(121, 121, 255);
     color: #fff;
     font-weight: bold;
     cursor: pointer;
@@ -62,6 +62,6 @@
 }
 
 .register__button-submit {
-    color: blue;
+    color: rgb(121, 121, 255);
     font-weight: bold;
 }
