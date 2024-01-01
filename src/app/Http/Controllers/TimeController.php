@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
-use App\Time;
+use App\Models\Time;
 
 class TimeController extends Controller
 {
