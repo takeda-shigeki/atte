@@ -16,4 +16,10 @@ use App\Http\Controllers\AuthController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [AuthController::class, 'index']);
+    Route::get('/', [TimeController::class, 'index']);
 });
+
+Route::post('/attendance/checkin', [TimeController::class, 'checkin']);
+Route::post('/attendance/checkout', [TimeController::class, 'checkout']);
+Route::post('/attendance/breakin', [TimeController::class, 'breakin']);
+Route::post('/attendance/breakout', [TimeController::class, 'breakout']);
