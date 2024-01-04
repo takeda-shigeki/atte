@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTimesTable extends Migration
+class CreateRestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,12 @@ class CreateTimesTable extends Migration
      */
     public function up()
     {
-        Schema::create('times', function (Blueprint $table) {
+        Schema::create('rests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->integer('year');
-            $table->integer('month');
-            $table->integer('day');
-            $table->dateTime('checkIn');
-            $table->dateTime('checkOut')->nullable();
-            $table->float('breakTime')->nullable();
-            $table->float('workTime')->nullable();
+            $table->foreignId('time_id')->constrained()->cascadeOnDelete();
+            $table->dateTime('breakIn');
+            $table->dateTime('breakOut')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +30,6 @@ class CreateTimesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('times');
+        Schema::dropIfExists('rests');
     }
 }

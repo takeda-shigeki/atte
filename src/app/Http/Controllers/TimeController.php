@@ -6,136 +6,112 @@ use Illuminate\Http\Request;
 use Auth;
 use Carbon\Carbon;
 use App\Models\Time;
+use App\Models\Rest;
 
 class TimeController extends Controller
 {
-    public function index() {
-        $today = Carbon::today();
-        dd($today);
-        $year = intval($today->year);
-        $month = intval($today->month);
-        $day = intval($today->day);
-        //当日を取得
-        $items = Time::GetYearAttendance($year)->GetMonthAttendance($month)->GetDayAttendance($day)->get();
-        return view('attendance',['items'=>$items]);
-    }
-
     //勤務開始
     public function checkin() {
-        // 同じ日に2回勤務開始ボタンを押したらhomeに戻る設定)
+        //同じ日に2回勤務開始ボタンを押せないようにする
         $user = Auth::user();
-        $oldtimein = Time::where('user_id',$user->id)->latest()->first();//一番最新のレコードを取得
-
-        $oldDay = '';
-
-        //退勤前に出勤を2度押せない制御
-        if($oldtimein) {
-            $oldTimePunchIn = new Carbon($oldtimein->punchIn);
-            $oldDay = $oldTimePunchIn->startOfDay();//最後に登録したpunchInの時刻を00:00:00で代入
-        }
-        $today = Carbon::today();//当日の日時を00:00:00で代入
-
-        if(($oldDay == $today) && (empty($oldtimein->punchOut))) {
-            return redirect()->back()->with('message','出勤打刻済みです');
+        $existent_checkin = Time::where('user_id',$user->id)->latest()->first();
+        if(!is_null($existent_checkin)) {
+            $existent_checkinDay = new Carbon($existent_checkin['checkIn']);
+            $existentDay = $existent_checkinDay->format('Y-m-d');
+            $today = Carbon::today()->format('Y-m-d');
+            if(($existentDay == $today)) {
+                return back()->with('alert','勤務開始ボタンは既に押されています');
+            }
         }
 
-        // 退勤後に再度出勤を押せない制御
-        if($oldtimein) {
-            $oldTimePunchOut = new Carbon($oldtimein->punchOut);
-            $oldDay = $oldTimePunchOut->startOfDay();//最後に登録したpunchInの時刻を00:00:00で代入
-        }
-
-        if(($oldDay == $today)) {
-            return redirect()->back()->with('message','退勤打刻済みです');
-        }
-
+        $today = Carbon::today();
+        $year = intval($today->year);
         $month = intval($today->month);
         $day = intval($today->day);
-        $year = intval($today->year);
-
-
+        $user = Auth::user();
         $time = Time::create([
             'user_id' => $user->id,
-            'user_name' =>$user->name,
-            'punchIn' => Carbon::now(),
+            'year' => $year,
             'month' => $month,
             'day' => $day,
-            'year' => $year,
+            'checkIn' => Carbon::now(),
         ]);
 
-        return redirect()->back();
+        return redirect('/')->with('message','本日の勤務開始時間を登録しました');
     }
 
-    //退勤アクション
-    public function timeOut() {
-        //ログインユーザーの最新のレコードを取得
+    //勤務終了
+    public function checkout() {
+        //勤務開始ボタンを押す前に勤務終了ボタンを押せないようにする
+        //同じ日に2回勤務終了ボタンを押せないようにする
         $user = Auth::user();
-        $timeOut = Time::where('user_id',$user->id)->latest()->first();
-
-        //string → datetime型
-        $now = new Carbon();
-        $punchIn = new Carbon($timeOut->punchIn);
-        $breakIn = new Carbon($timeOut->breakIn);
-        $breakOut = new Carbon($timeOut->breakOut);
-        //実労時間(Minute)
-        $stayTime = $punchIn->diffInMinutes($now);
-        $breakTime = $breakIn-> diffInMinutes($breakOut);
-        $workingMinute = $stayTime - $breakTime;
-        //15分刻み
-        $workingHour = ceil($workingMinute / 15) * 0.25;
-
-        //退勤処理がされていない場合のみ退勤処理を実行
-        if($timeOut) {
-            if(empty($timeOut->punchOut)) {
-                if($timeOut->breakIn && !$timeOut->breakOut) {
-                    return redirect()->back()->with('message','休憩終了が打刻されていません');
-                } else {
-                    $timeOut->update([
-                        'punchOut' => Carbon::now(),
-                        'workTime' => $workingHour
-                    ]);
-                    return redirect()->back()->with('message','お疲れ様でした');
-                }
+        $existent_checkin = Time::where('user_id',$user->id)->latest()->first();
+        if(is_null($existent_checkin)) {
+            return back()->with('alert','本日の勤務開始記録がありません');
+        } else {
+            $existent_checkinDay = new Carbon($existent_checkin['checkIn']);
+            $existentDay = $existent_checkinDay->format('Y-m-d');
+            $today = Carbon::today()->format('Y-m-d');
+            if(($existentDay != $today)) {
+                return back()->with('alert','本日の勤務開始記録がありません');
             } else {
-                $today = new Carbon();
-                $day = $today->day;
-                $oldPunchOut = new Carbon();
-                $oldPunchOutDay = $oldPunchOut->day;
-                if ($day == $oldPunchOutDay) {
-                    return redirect()->back()->with('message','退勤済みです');
-                } else {
-                    return redirect()->back()->with('message','出勤打刻をしてください');
+                if(!is_null($existent_checkin['checkOut'])) {
+                    return back()->with('alert','勤務終了ボタンは既に押されています');
                 }
             }
+        }
+
+        //休憩終了ボタンを押す前に勤務終了ボタンを押せないようにする
+        $existent_breakin = Rest::where('user_id',$user->id)->where('time_id',$existent_checkin->id)->latest()->first();
+        if(!is_null($existent_breakin) && is_null($existent_breakin['breakOut'])) {
+            return back()->with('alert','休憩終了ボタンを先に押してください');
+        }
+    
+        Time::where('user_id', $existent_checkin['user_id'])->where('checkIn', $existent_checkin['checkIn'])->update(['checkOut' => Carbon::now()]);
+        return redirect('/')->with('message','本日の勤務終了時間を登録しました');    
+    }
+        
+    //休憩開始
+    public function breakin() {
+        $user = Auth::user();
+        $existent_checkin = Time::where('user_id',$user->id)->latest()->first();
+        if(!is_null($existent_checkin)) {
+            $existent_breakin = Rest::where('user_id',$user->id)->where('time_id',$existent_checkin['id'])->latest()->first();
+        }
+        if(is_null($existent_checkin)) {
+            return back()->with('alert','休憩開始ボタンは有効ではありません');
         } else {
-            return redirect()->back()->with('message','出勤打刻がされていません');
-        } 
+            if (is_null($existent_checkin['checkOut']) && (is_null($existent_breakin)||!is_null($existent_breakin['breakOut']))) {
+                $rest = Rest::create([
+                    'user_id' => $user->id,
+                    'time_id' => $existent_checkin->id,
+                    'breakIn' => Carbon::now()
+                ]);
+                return redirect('/')->with('message','休憩開始時間を登録しました');
+            } else {
+                return back()->with('alert','休憩開始ボタンは有効ではありません');
+            }
+        }
     }
 
-    //休憩開始アクション
-    public function breakIn() {
+    //休憩終了
+    public function breakout() {
+        //休憩開始ボタンが押された状態でないと休憩終了ボタンを押せないようにする
         $user = Auth::user();
-        $oldtimein = Time::where('user_id',$user->id)->latest()->first();
-        if($oldtimein->punchIn && !$oldtimein->punchOut && !$oldtimein->breakIn) {
-            $oldtimein->update([
-                'breakIn' => Carbon::now(),
-            ]);
-            return redirect()->back();
+        $existent_checkin = Time::where('user_id',$user->id)->latest()->first();
+        if(!is_null($existent_checkin)) {
+            $existent_breakin = Rest::where('user_id',$user->id)->where('time_id',$existent_checkin['id'])->latest()->first();
         }
-        return redirect()->back();
-    }
-
-    //休憩終了アクション
-    public function breakOut() {
-        $user = Auth::user();
-        $oldtimein = Time::where('user_id',$user->id)->latest()->first();
-        if($oldtimein->breakIn && !$oldtimein->breakOut) {
-            $oldtimein->update([
-                'breakOut' => Carbon::now(),
-            ]);
-            return redirect()->back();
+        if(is_null($existent_checkin)) {
+            return back()->with('alert','休憩終了ボタンは有効ではありません');
+        } else {
+            if (is_null($existent_checkin['checkOut']) && !is_null($existent_breakin) && is_null($existent_breakin['breakOut'])) {
+                Rest::where('user_id', $existent_breakin['user_id'])->where('breakIn', $existent_breakin['breakIn'])->update(['breakOut' => Carbon::now()]);
+                return redirect('/')->with('message','休憩開始終了を登録しました');
+            } else {
+                return back()->with('alert','休憩終了ボタンは有効ではありません');
+            }
         }
-        return redirect()->back();
     }
 
     //勤怠実績

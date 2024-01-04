@@ -63,3 +63,17 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+.alert {
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: red;
+}
+
+.message {
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: black;
+}
