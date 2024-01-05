@@ -20,6 +20,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/checkin', [TimeController::class, 'checkin']);
-Route::post('/checkout', [TimeController::class, 'checkout']);
+Route::post('/checkout', [TimeController::class, 'checkOut']);
 Route::post('/breakin', [TimeController::class, 'breakin']);
 Route::post('/breakout', [TimeController::class, 'breakout']);

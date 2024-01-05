@@ -20,7 +20,7 @@ class DateChange extends Command
      *
      * @var string
      */
-    protected $description = 'change date';
+    protected $description = '日付変更';
 
     /**
      * Create a new command instance.
@@ -43,6 +43,9 @@ class DateChange extends Command
         $year = intval($today->year);
         $month = intval($today->month);
         $day = intval($today->day);
-        Time::where('year',$year)->where('month',$month)->where('day',$day)->where('checkIn',!is_null)->where('checkOut',is_null)->update(['checkOut' => Carbon::now()]);
+        $records = Time::where('year',$year)->where('month',$month)->where('day',$day)->whereNotNull('checkIn')->whereNull('checkOut')->get();
+        foreach ($records as $record) {
+            Time::where('id', $record['id'])->update(['checkOut' => Carbon::now()]);
+        }
     }
 }

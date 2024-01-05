@@ -13,10 +13,15 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
+
+    protected $commands = [
+        Commands\DateChange::Class,
+    ];
+    
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->call('App\Http\Controllers\TimeController@breakin')->daily();
+        $schedule->command('dateChange')->dailyAt('23:59');
     }
 
     /**
