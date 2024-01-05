@@ -13,14 +13,14 @@ class DateChange extends Command
      *
      * @var string
      */
-    protected $signature = 'command:dateChange';
+    protected $signature = 'dateChange';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'change date';
 
     /**
      * Create a new command instance.
