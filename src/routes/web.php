@@ -23,3 +23,6 @@ Route::post('/checkin', [TimeController::class, 'checkin']);
 Route::post('/checkout', [TimeController::class, 'checkOut']);
 Route::post('/breakin', [TimeController::class, 'breakin']);
 Route::post('/breakout', [TimeController::class, 'breakout']);
+
+Route::get('/attendance', [TimeController::class, 'record']);
+Route::post('/attendance', [TimeController::class, 'record']);
