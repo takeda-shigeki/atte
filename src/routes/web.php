@@ -17,12 +17,13 @@ use App\Http\Controllers\TimeController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [AuthController::class, 'index']);
+    Route::post('/checkin', [TimeController::class, 'checkin']);
+    Route::post('/checkout', [TimeController::class, 'checkout']);
+    Route::post('/breakin', [TimeController::class, 'breakin']);
+    Route::post('/breakout', [TimeController::class, 'breakout']);
+    Route::get('/attendance', [TimeController::class, 'record']);
+    Route::post('/attendance', [TimeController::class, 'record']);
+    Route::get('/users', [TimeController::class, 'userlist']);
+    Route::get('/users/attendance', [TimeController::class, 'eachuser']);
+    Route::post('/users/attendance', [TimeController::class, 'eachuser']);
 });
-
-Route::post('/checkin', [TimeController::class, 'checkin']);
-Route::post('/checkout', [TimeController::class, 'checkOut']);
-Route::post('/breakin', [TimeController::class, 'breakin']);
-Route::post('/breakout', [TimeController::class, 'breakout']);
-
-Route::get('/attendance', [TimeController::class, 'record']);
-Route::post('/attendance', [TimeController::class, 'record']);

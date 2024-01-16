@@ -13,7 +13,6 @@ class Rest extends Model
 
     public function time()
     {
-        $this->belongsTo(Auth::user());
         $this->belongsTo(Time::class);
     }
 }

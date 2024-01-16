@@ -141,6 +141,7 @@ class TimeController extends Controller
         $year = intval($date->year);
         $month = intval($date->month);
         $day = intval($date->day);
+        $next_record = Time::where('year',$year)->where('month',$month)->where('day',$day+1)->oldest()->first();
 
         if($date==Carbon::today()) {
             $date = $date->addDay(-1);
@@ -161,9 +162,9 @@ class TimeController extends Controller
             $request->page,
             array('path' => $request->url())
             );
-            return view('attendance',['items'=>$items])->with('alert','本日以降の勤務実績は閲覧できません　→　＜ボタンを押してください');
+            return view('attendance',['items'=>$items])->with('alert','本日以降の勤務実績は閲覧できません　→　＜ ボタンを押してください');
         }
-        elseif(!Time::where('year',$year)->where('month',$month)->where('day',$day)->exists()) {
+        elseif(!is_null($next_record) && $next_record['id'] == 1) {
             $date = $date->addDay(1);
             $year = intval($date->year);
             $month = intval($date->month);
@@ -182,7 +183,7 @@ class TimeController extends Controller
             $request->page,
             array('path' => $request->url())
             );
-            return view('attendance',['items'=>$items])->with('alert','この日より前の勤務実績は閲覧できません　→　＞ボタンを押してください');
+            return view('attendance',['items'=>$items])->with('alert','この日より前の勤務実績は閲覧できません　→　＞ ボタンを押してください');
         }
         else {
             $items = Time::where('year',$year)->where('month',$month)->where('day',$day)->get();
@@ -200,6 +201,55 @@ class TimeController extends Controller
             array('path' => $request->url())
             );
             return view('attendance',['items'=>$items]);
+        }
+    }
+
+    //ユーザー一覧表示
+    public function userlist(Request $request) {
+        $items = User::all();
+        $items = collect($items);
+        $items = new LengthAwarePaginator(
+            $items->forPage($request->page, 5),
+            count($items),
+            5,
+            $request->page,
+            array('path' => $request->url())
+            );
+        return view('users',['items'=>$items]);
+    }
+
+    //ユーザー別勤怠実績
+    public function eachuser(Request $request) {
+        $userid = $request->userid;
+
+        if(!is_null($userid)) {
+            $request->session()->forget('userid');
+            $request->session()->put('userid', $userid);
+            $items = Time::where('user_id',$userid)->get();
+            $user = User::Where('id',$userid)->first();
+            $items = collect($items);
+            $items = new LengthAwarePaginator(
+                $items->forPage($request->page, 5),
+                count($items),
+                5,
+                $request->page,
+                array('path' => $request->url())
+            );
+            return view('eachuser_attendance',['items'=>$items, 'user'=>$user]);
+        }
+        else {
+            $userid = session()->get('userid');
+            $items = Time::where('user_id',$userid)->get();
+            $user = User::Where('id',$userid)->first();
+            $items = collect($items);
+            $items = new LengthAwarePaginator(
+                $items->forPage($request->page, 5),
+                count($items),
+                5,
+                $request->page,
+                array('path' => $request->url())
+            );
+            return view('eachuser_attendance',['items'=>$items, 'user'=>$user]);
         }
     }
 }
