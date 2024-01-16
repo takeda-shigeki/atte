@@ -252,4 +252,5 @@ class TimeController extends Controller
             return view('eachuser_attendance',['items'=>$items, 'user'=>$user]);
         }
     }
+
 }
