@@ -7,6 +7,8 @@
 @section('content')
 <div class="title">
     <a href="/users">ユーザー一覧に戻る</a>
+</div>
+<div class="title">
     <p>{{ $user['name'] ?? '' }}さんの勤怠実績です</p>
 </div>
 <div class="attendance-content">
@@ -22,10 +24,10 @@
             @foreach ($items as $item)
             <tr class="attendance-table__row">
                 <td class="attendance-table__item">{{ $item['year'] }}年{{ $item['month'] }}月{{ $item['day'] }}日</td>
-                <td class="attendance-table__item">{{ (new DateTime($item['checkIn']))->format('H:i') }}</td>
-                <td class="attendance-table__item">{{ (new DateTime($item['checkOut']))->format('H:i') }}</td>
-                <td class="attendance-table__item">{{ $item['breakTime'] }}</td>
-                <td class="attendance-table__item">{{ sprintf('%.2f', $item['workTime']) }}</td>
+                <td class="attendance-table__item">{{ (new DateTime($item['check_in']))->format('H:i') }}</td>
+                <td class="attendance-table__item">{{ (new DateTime($item['check_out']))->format('H:i') }}</td>
+                <td class="attendance-table__item">{{ $item['break_time'] }}</td>
+                <td class="attendance-table__item">{{ sprintf('%.2f', $item['work_time']) }}</td>
             </tr>
             @endforeach
         </table>

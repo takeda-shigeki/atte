@@ -26,4 +26,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/users', [TimeController::class, 'userlist']);
     Route::get('/users/attendance', [TimeController::class, 'eachuser']);
     Route::post('/users/attendance', [TimeController::class, 'eachuser']);
-});
+}
+);

@@ -9,7 +9,7 @@ class Time extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'year', 'month', 'day', 'checkIn', 'checkOut', 'breakTime', 'workTime'];
+    protected $fillable = ['user_id', 'year', 'month', 'day', 'check_in', 'check_out', 'break_time', 'work_time'];
 
     public function user()
     {

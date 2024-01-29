@@ -42,26 +42,26 @@ class DateChange extends Command
         $year = intval($today->year);
         $month = intval($today->month);
         $day = intval($today->day);
-        $records = Time::where('year',$year)->where('month',$month)->where('day',$day)->whereNotNull('checkIn')->whereNull('checkOut')->get();
+        $records = Time::where('year',$year)->where('month',$month)->where('day',$day)->whereNotNull('check_in')->whereNull('check_out')->get();
         foreach ($records as $record) {
             $break_record = Rest::where('time_id', $record['id'])->latest()->first();
-            if(!is_null($break_record) && !is_null($break_record['breakIn']) && is_null($break_record['breakOut'])) {
-                Rest::where('id', $break_record['id'])->update(['breakOut' => Carbon::now()]);
+            if(!is_null($break_record) && !is_null($break_record['break_in']) && is_null($break_record['break_out'])) {
+                Rest::where('id', $break_record['id'])->update(['break_out' => Carbon::now()]);
 
                 //休憩時間の算出と登録
                 $latestbreak = Rest::where('id', $break_record['id'])->first();
-                $latestbreaktime = intval((strtotime($latestbreak['breakOut'])-strtotime($latestbreak['breakIn']))/60);
+                $latestbreaktime = intval((strtotime($latestbreak['break_out'])-strtotime($latestbreak['break_in']))/60);
                 $existent_breaktime = Time::where('id', $latestbreak['time_id'])->first();
-                $breaktime = $existent_breaktime['breakTime']+$latestbreaktime;
-                Time::where('id', $latestbreak['time_id'])->update(['breakTime' => $breaktime]);
+                $breaktime = $existent_breaktime['break_time']+$latestbreaktime;
+                Time::where('id', $latestbreak['time_id'])->update(['break_time' => $breaktime]);
                 }
 
-            Time::where('id', $record['id'])->update(['checkOut' => Carbon::now()]);
+            Time::where('id', $record['id'])->update(['check_out' => Carbon::now()]);
 
             //勤務時間の算出と登録
             $latest_checkout = Time::where('id', $record['id'])->first();
-            $worktime = number_format((strtotime($latest_checkout['checkOut'])-strtotime($latest_checkout['checkIn']))/3600-$latest_checkout['breakTime']/60, 2);
-            Time::where('id', $latest_checkout['id'])->update(['workTime' => $worktime]);
+            $worktime = number_format((strtotime($latest_checkout['check_out'])-strtotime($latest_checkout['check_in']))/3600-$latest_checkout['break_time']/60, 2);
+            Time::where('id', $latest_checkout['id'])->update(['work_time' => $worktime]);
 
             $tomorrow = Carbon::tomorrow();
             Time::create([
@@ -69,13 +69,13 @@ class DateChange extends Command
                 'year' => intval($tomorrow->year),
                 'month' => intval($tomorrow->month),
                 'day' => intval($tomorrow->day),
-                'checkIn' => $tomorrow,
+                'check_in' => $tomorrow,
             ]);
 
-            $tomorrow_time = Time::where('user_id', $record['user_id'])->where('checkIn', $tomorrow)->first();
+            $tomorrow_time = Time::where('user_id', $record['user_id'])->where('check_in', $tomorrow)->first();
             Rest::create([
                 'time_id' => $tomorrow_time->id,
-                'breakIn' => $tomorrow
+                'break_in' => $tomorrow
             ]);
         }
     }

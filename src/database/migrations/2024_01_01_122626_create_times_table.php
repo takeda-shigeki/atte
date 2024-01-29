@@ -19,10 +19,10 @@ class CreateTimesTable extends Migration
             $table->integer('year');
             $table->integer('month');
             $table->integer('day');
-            $table->dateTime('checkIn');
-            $table->dateTime('checkOut')->nullable();
-            $table->float('breakTime')->nullable();
-            $table->float('workTime')->nullable();
+            $table->dateTime('check_in');
+            $table->dateTime('check_out')->nullable();
+            $table->float('break_time')->nullable();
+            $table->float('work_time')->nullable();
             $table->timestamps();
         });
     }

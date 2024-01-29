@@ -12,7 +12,7 @@
             <input type="hidden" name="add" value=-1>
             <button class="date__button" type="submit">＜</button>
         </form>
-        <p class="date__indication">{{ $items->first()->year ?? '' }}年{{ $items->first()->month ?? '' }}月{{ $items->first()->day ?? '' }}日</p>
+        <p class="date__indication">{{ $year ?? '' }}年{{ $month ?? '' }}月{{ $day ?? '' }}日</p>
         <form class="date__form" action="/attendance" method="post">
             @csrf
             <input type="hidden" name="add" value=1>
@@ -36,10 +36,10 @@
             @foreach ($items as $item)
             <tr class="attendance-table__row">
                 <td class="attendance-table__item">{{ $item['user_id'] }}</td>
-                <td class="attendance-table__item">{{ (new DateTime($item['checkIn']))->format('H:i') }}</td>
-                <td class="attendance-table__item">{{ (new DateTime($item['checkOut']))->format('H:i') }}</td>
-                <td class="attendance-table__item">{{ $item['breakTime'] }}</td>
-                <td class="attendance-table__item">{{ sprintf('%.2f', $item['workTime']) }}</td>
+                <td class="attendance-table__item">{{ (new DateTime($item['check_in']))->format('H:i') }}</td>
+                <td class="attendance-table__item">{{ (new DateTime($item['check_out']))->format('H:i') }}</td>
+                <td class="attendance-table__item">{{ $item['break_time'] }}</td>
+                <td class="attendance-table__item">{{ sprintf('%.2f', $item['work_time']) }}</td>
             </tr>
             @endforeach
         </table>
