@@ -22,12 +22,12 @@ switch ($_SERVER['HTTP_HOST'] ?? 'localhost') {
         break;
 
     // テスト環境
-    case 'staging.maydomain.com':
+    case 'staging-atte':
         $app->loadEnvironmentFrom('env/.env.stg');
         break;
 
     // 本番環境
-    case 'prod.maydomain.com':
+    case 'prod-atte':
         $app->loadEnvironmentFrom('env/.env.prod');
         break;
 }
